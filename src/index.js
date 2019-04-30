@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const routes = require('./routes');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
@@ -10,17 +9,12 @@ app.use(cors());
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-io.on('connection', socket => {
-    socket.join('files');
-    socket.on('file', file => {
-        io.to('files').emit('file', file)
-    })
-});
+const routes = require('./routes')({ io });
+app.use(routes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')));
-app.use(routes);
 
 const port = 3333;
 
