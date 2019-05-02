@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')));
 
-const port = 3333;
+const port = 3333 || process.env.port;
 
 mongoose.connect('mongodb+srv://rodrigo:root@cluster0-cql4v.mongodb.net/mybox?retryWrites=true', {
     useNewUrlParser: true
