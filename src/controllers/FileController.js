@@ -2,7 +2,7 @@ const File = require('../models/File');
 const Box = require('../models/Box');
 const _ = require('lodash');
 
-const fileController = ({ io }) => {
+const FileController = ({ io }) => {
 
     const store = async (req, res) => {
         const file = await File.create({ 
@@ -41,4 +41,4 @@ const fileController = ({ io }) => {
     return { store, remove }
 }
 
-module.exports = fileController
+module.exports = FileController
