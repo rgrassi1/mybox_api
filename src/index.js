@@ -10,9 +10,9 @@ const io = require('socket.io')(server);
 const routes = require('./routes')({ io });
 
 app.use(cors());
-app.use(routes);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(routes);
 app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')));
 
 const port = 3333 || process.env.port;

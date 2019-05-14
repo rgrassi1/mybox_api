@@ -1,7 +1,7 @@
 const Box = require('../models/Box');
 
 const store = async(req, res) => {
-    const box = await Box.create(req.body);        
+    const box = await Box.create(req.body);   
     return res.json(box);
 }
 
