@@ -5,9 +5,12 @@ const _ = require('lodash');
 const FileController = ({ io }) => {
 
     const store = async (req, res) => {
+        const { originalname: name, size, key, location: url = '' } = req.file;
         const file = await File.create({ 
-            title: req.file.originalname,
-            path: req.file.key
+            name,
+            size,
+            key,
+            url
         });
 
         const box = await Box.findById(req.params.id);

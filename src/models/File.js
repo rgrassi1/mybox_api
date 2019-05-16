@@ -1,22 +1,30 @@
 const mongoose = require('mongoose');
 
 const File = new mongoose.Schema({
-    title: {
+    name: {
         type: String,
         required: true
     },
-    path: {
+    size: {
+        type: Number,
+        required: true
+    },
+    key: {
+        type: String,
+        required: true
+    },
+    url: {
         type: String,
         required: true
     }
 }, {
     timestamps: true,
-    toObject: { virtuals: true },
-    toJSON: { virtuals: true }
+    //toObject: { virtuals: true },
+    //toJSON: { virtuals: true }
 })
 
-File.virtual('url').get(function() {
+/*File.virtual('url').get(function() {
     return `http://localhost:3333/files/${encodeURIComponent(this.path)}`
-})
+})*/
 
 module.exports = mongoose.model("File", File)

@@ -11,7 +11,6 @@ const indexRouter = ({ io }) => {
     io.on('connect', socket => {
         const { match } = socket.handshake.query
         if (match) {
-            //console.log('user connected on match', match);
             socket.join(`user-${match}`);
         }    
     })
