@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')));
 
-const port = 3333 || process.env.port;
-const mongooseURL = 'mongodb+srv://rodrigo:root@cluster0-cql4v.mongodb.net/mybox?retryWrites=true' || process.env.mongooseURL;
+const port = process.env.APP_PORT;
+const mongooseURL = process.env.MONGO_URL;
 
 mongoose.connect(mongooseURL, { useNewUrlParser: true })
     .then(() => {

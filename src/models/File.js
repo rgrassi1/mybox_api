@@ -17,14 +17,13 @@ const File = new mongoose.Schema({
         type: String,
         required: true
     }
-}, {
-    timestamps: true,
-    //toObject: { virtuals: true },
-    //toJSON: { virtuals: true }
-})
+}, { timestamps: true });
 
-/*File.virtual('url').get(function() {
-    return `http://localhost:3333/files/${encodeURIComponent(this.path)}`
-})*/
+File.pre('save', function() {
+    if (!this.url) {
+        this.url = `${process.env.APP_URL}/files/${this.key}`
+    }
+});
+
 
 module.exports = mongoose.model("File", File)
