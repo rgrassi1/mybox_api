@@ -20,7 +20,7 @@ const indexRouter = ({ io }) => {
     router.get("/boxes/:id", BoxController.show);
     
     router.post("/boxes/:id/files", multer(multerConfig).single('file'), FileController.store);
-    router.delete("/boxes/:idBox/files/:idFile", FileController.remove);
+    router.delete("/files/:idFile", FileController.remove);
 
     return router;
 }

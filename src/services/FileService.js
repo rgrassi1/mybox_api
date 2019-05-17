@@ -9,7 +9,7 @@ const removeFromRepository = async key => {
         return await s3.deleteObject({ Bucket: 'mybox-repo', Key: key }).promise();                
     } else {
         return promisify(fs.unlink)(
-            path.resolve(__dirname, "..", "..", "tmp", key);
+            path.resolve(__dirname, "..", "..", "tmp", key)
         )
     }
 }
