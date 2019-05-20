@@ -6,10 +6,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
 
-const routes = require('./routes')({ io });
+const routes = require('./routes');
 
 app.use(cors());
 app.use(express.json());
@@ -23,7 +21,7 @@ const mongooseURL = process.env.MONGO_URL;
 mongoose.connect(mongooseURL, { useNewUrlParser: true })
     .then(() => {
         console.log('[X] database runing')    
-        server.listen(port, () => {
+        app.listen(port, () => {
             console.log(`[X] server runing in port: ${port}`)            
         })
     }).catch((e) => {
