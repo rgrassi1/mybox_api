@@ -6,13 +6,14 @@ const store = async(req, res) => {
 }
 
 const show = async(req, res) => {
-    const box = await Box.findById(req.params.id).populate({
-        path: "files",
-        options: {
-            sort: { createdAt: -1 }
-        } 
-    });
-    return res.json(box);
+    try {
+        const box = await Box.findById(req.params.id);
+        const populate = { path: "files", options: { sort: { createdAt: -1 } } }
+        const response = await Box.populate(box, populate);
+        return res.json(response);    
+    } catch(err) {
+        return res.status(404).send(); 
+    }
 }
 
 const showAll = async(req, res) => {
