@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const { gerarHash } = require('../utils')
 
 const UserSchema = mongoose.Schema({
     email: {
@@ -12,18 +12,14 @@ const UserSchema = mongoose.Schema({
     }
 }, { timestamps: true });
 
-UserSchema.pre('save', function() {
+UserSchema.pre('save', async function() {
     const user = this;
     if (!user.isModified('password')) {
         return next();
     }
 
-    bcrypt.genSalt((err, salt) => { 
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            user.password = hash;
-            next();
-        })
-    })
+    const hash = await gerarHash(user.password);
+    user.password = hash;
 })
 
 const User = mongoose.Schema('User', UserSchema);
