@@ -18,9 +18,9 @@ UserSchema.pre('save', async function() {
         return next();
     }
 
-    //const hash = await gerarHash(user.password);
     const hash = await gerarHash(user.password);
     user.password = hash;
+    next();
 })
 
 UserSchema.methods.gerarHash = async function(password) {
@@ -31,18 +31,6 @@ UserSchema.methods.gerarHash = async function(password) {
 UserSchema.methods.checkPassword = async function(password) {
     return await bcrypt.compare(password, this.password);
 }
-
-/*UserSchema.methods.checkPassword = function(password) {
-    return new Promise((resolve, reject) => {
-        bcrypt.compare(password, this.password, (error, isMatch) => {
-            if (error) {
-                reject(error)
-            } else {
-                resolve(isMatch)
-            }
-        })
-    })
-}*/
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;

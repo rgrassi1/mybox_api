@@ -13,7 +13,7 @@ const signin = async(req, res) => {
     }
 
     const payload = { id: user._id, email: user.email }
-    jwt.sign(payload, process.env.JWT_SECRET, (error, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 }, (error, token) => {
         return res.status(200).json({ success: true, token: token });
     });
 }
