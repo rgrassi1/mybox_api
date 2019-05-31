@@ -12,13 +12,13 @@ const UserSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-UserSchema.pre('save', async function() {
+UserSchema.pre('save', async function(next) {
     const user = this;
     if (!user.isModified('password')) {
         return next();
     }
 
-    const hash = await gerarHash(user.password);
+    const hash = await this.gerarHash(user.password);
     user.password = hash;
     next();
 })
