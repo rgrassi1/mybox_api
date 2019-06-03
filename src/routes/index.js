@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const restritoRouter = require('./restrito');
+const restrictedRouter = require('./restricted');
 const userRouter = require('./users');
 
-router.use('/restrito', restritoRouter);
+router.use('/restrito', restrictedRouter);
 router.use('/user', userRouter);
 
 module.exports = router;
