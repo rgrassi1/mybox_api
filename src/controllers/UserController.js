@@ -4,12 +4,12 @@ const User = require('../models/User');
 const signin = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
+        return res.status(401).json({ success: false, message: 'Wrong credentials' });
     }
 
     const signed = await user.checkPassword(req.body.password);
     if (!signed) {
-        return res.status(401).json({ success: false, message: 'Wrong credentials' });
+        return res.status(401).send({ success: false, message: 'Wrong credentials' });
     }
 
     const payload = { id: user._id, email: user.email }
