@@ -3,25 +3,24 @@ const User = require('../models/User');
 
 const signin = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
-    if (!user) {
-        return res.status(401).json({ success: false, message: 'Wrong credentials' });
-    }
-
-    const signed = await user.checkPassword(req.body.password);
-    if (!signed) {
-        return res.status(401).send({ success: false, message: 'Wrong credentials' });
-    }
-
-    const payload = { id: user._id, email: user.email }
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60  * 60 * 24 }, (error, token) => {
-        return res.status(200).json({ success: true, token: token });
-    });
+    if (user) {
+        const signed = await user.checkPassword(req.body.password);
+        if (signed) {
+            const payload = { id: user._id, email: user.email }
+            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60  * 60 * 24 });
+            res.send({ success: true, token: token })
+        } else {
+            res.send({ success: false, message: 'Wrong credentials' });
+        }    
+    } else {
+        res.send({ success: false, message: 'Wrong credentials' });
+    } 
 }
 
 const signup = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
     if (user) {
-        return res.status(409).json({ success: false, message: 'User not available' })
+        return res.send({ success: false, message: 'User not available' })
     }
 
     await User.create(req.body);

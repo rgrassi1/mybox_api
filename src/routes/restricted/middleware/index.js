@@ -4,9 +4,10 @@ const checkToken = (req, res, next) => {
     const token = req.headers['x-access-token'];
     try {
         jwt.verify(token, process.env.JWT_SECRET);
-        return next();
+        next();
     } catch(err) {            
-        return res.status(401).json({ success: false, message: err.message });        
+        res.status(401);
+        res.send({ success: false, message: err.message });
     }
 }
 
