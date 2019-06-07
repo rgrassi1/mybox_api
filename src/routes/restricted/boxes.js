@@ -7,6 +7,6 @@ const FileController = require('../../controllers/FileController');
 router.get("/", BoxController.showAll);
 router.post("/", BoxController.store);
 router.get("/:id", BoxController.show);
-router.post("/boxes/:id/files", multer(multerConfig).single('file'), FileController.store);
+router.post("/:id/files", multer(multerConfig).single('file'), FileController.store);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const File = new mongoose.Schema({
+const FileSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -19,11 +19,13 @@ const File = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-File.pre('save', function() {
-    if (!this.url) {
-        this.url = `${process.env.APP_URL}/files/${this.key}`
+FileSchema.pre('save', function() {
+    const file = this;
+
+    if (!file.url) {
+        file.url = `${process.env.APP_URL}/files/${file.key}`
     }
 });
 
-
-module.exports = mongoose.model("File", File)
+const File = mongoose.model('File', FileSchema);
+module.exports = File;

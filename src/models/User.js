@@ -9,11 +9,22 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    avatar_key: {
+        type: String
+    },
+    avatar_url: {
+        type: String,
     }
 }, { timestamps: true });
 
 UserSchema.pre('save', async function(next) {
     const user = this;
+
+    if (!user.avatar_url) {
+        user.avatar_url = `${process.env.APP_URL}/files/${user.avatar_key}`;
+    }
+
     if (!user.isModified('password')) {
         return next();
     }

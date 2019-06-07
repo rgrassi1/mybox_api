@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const signin = async(req, res) => {
+const signIn = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
     if (user) {
         const signed = await user.checkPassword(req.body.password);
@@ -17,14 +17,28 @@ const signin = async(req, res) => {
     } 
 }
 
-const signup = async(req, res) => {
+const signUp = async(req, res) => {
+    //const { key, location: url = '' } = req.avatar;
+
     const user = await User.findOne({ email: req.body.email })
     if (user) {
         return res.send({ success: false, message: 'User not available' })
     }
 
-    await User.create(req.body);
-    return res.status(201).json({ success: true, message: 'User created' });
+    const newUser = await User.create(req.body);
+    const restrictedUser = { _id: newUser._id, email: newUser.email }
+    return res.status(201).json(restrictedUser);
 }
 
-module.exports = { signin, signup }
+const updateAvatar = async(req, res) => {
+    const { key, location: url = '' } = req.file;
+
+    const user = await User.findOne({ _id: req.params.id });
+    user.avatar_key = key;
+    user.url = url;
+
+    const updatedUser = await user.save();
+    res.json(updatedUser);
+}
+
+module.exports = { signIn, signUp, updateAvatar }
