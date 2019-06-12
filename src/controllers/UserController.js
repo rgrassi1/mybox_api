@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { removeFromRepository } = require('../services/FileService');
+
 
 const signIn = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
@@ -18,8 +20,6 @@ const signIn = async(req, res) => {
 }
 
 const signUp = async(req, res) => {
-    //const { key, location: url = '' } = req.avatar;
-
     const user = await User.findOne({ email: req.body.email })
     if (user) {
         return res.send({ success: false, message: 'User not available' })
@@ -27,18 +27,22 @@ const signUp = async(req, res) => {
 
     const newUser = await User.create(req.body);
     const restrictedUser = { _id: newUser._id, email: newUser.email }
-    return res.status(201).json(restrictedUser);
+    res.status(201).json(restrictedUser);
 }
 
 const updateAvatar = async(req, res) => {
-    const { key, location: url = '' } = req.file;
+    const { key = '', location: url = '' } = req.file;
 
-    const user = await User.findOne({ _id: req.params.id });
-    user.avatar_key = key;
-    user.url = url;
-
-    const updatedUser = await user.save();
-    res.json(updatedUser);
+    try {
+        const user = await User.findOne({ _id: req.params.id });
+        user.avatar_key = key;
+        user.avatar_url = url;
+    
+        const updatedUser = await user.save();
+        res.json(updatedUser);    
+    } catch(err) {
+        res.status(404).send({ success: false, message: 'User not found' })
+    }
 }
 
 module.exports = { signIn, signUp, updateAvatar }

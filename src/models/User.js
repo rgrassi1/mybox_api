@@ -21,8 +21,10 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save', async function(next) {
     const user = this;
 
-    if (!user.avatar_url) {
-        user.avatar_url = `${process.env.APP_URL}/files/${user.avatar_key}`;
+    if (user.avatar_key) {
+        if (!user.avatar_url) {
+            user.avatar_url = `${process.env.APP_URL}/files/${user.avatar_key}`;
+        }
     }
 
     if (!user.isModified('password')) {

@@ -1,18 +1,12 @@
 const router = require('express').Router();
 const restricted = require('./restricted');
 const user = require('./users');
-const { checkToken } = require('./utils')
+const { checkToken } = require('./check_token')
 
 router.use('/restrito', restricted);
 router.use('/user', user);
-router.get('/token', (req, res) => {
-    const token = req.headers['x-access-token'];
-    try {
-        checkToken(token);
-        res.send();
-    } catch(err) {
-        return res.status(401).send({ success: false, message: err });
-    }
+router.get('/token', checkToken, (req, res) => {
+    res.send({ success: true });
 });
 
 module.exports = router;

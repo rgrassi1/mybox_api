@@ -1,18 +1,12 @@
 const router = require('express').Router();
 const boxes = require('./boxes');
 const files = require('./files');
-const { checkToken } = require('../utils')
+const users = require('./users');
+const { checkToken } = require('../check_token')
 
-router.use((req, res, next) => {
-    const token = req.headers['x-access-token'];
-    try {
-        checkToken(token);
-        next();
-    } catch(err) {
-        return res.status(401).send({ success: false, message: err });
-    }
-});
+router.use(checkToken);
 router.use('/boxes', boxes);
 router.use('/files', files);
+router.use('/users', users);
 
 module.exports = router;
