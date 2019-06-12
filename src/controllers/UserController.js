@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { removeFromRepository } = require('../services/FileService');
-
 
 const signIn = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
@@ -32,15 +30,14 @@ const signUp = async(req, res) => {
 
 const updateAvatar = async(req, res) => {
     const { key = '', location: url = '' } = req.file;
-
-    try {
-        const user = await User.findOne({ _id: req.params.id });
-        user.avatar_key = key;
-        user.avatar_url = url;
     
+    const user = await User.findOne({ email: req.params.email });
+    if (user) {
+        user.avatar_key = key;
+        user.avatar_url = url;    
         const updatedUser = await user.save();
         res.json(updatedUser);    
-    } catch(err) {
+    } else {
         res.status(404).send({ success: false, message: 'User not found' })
     }
 }
