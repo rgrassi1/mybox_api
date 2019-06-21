@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+import nodemailer from 'nodemailer';
 const User = require('../models/User');
 
 const signIn = async(req, res) => {
@@ -23,10 +24,28 @@ const signUp = async(req, res) => {
         return res.send({ success: false, message: 'User not available' })
     }
 
-    const newUser = await User.create(req.body);
-    const restrictedUser = { _id: newUser._id, email: newUser.email }
+    const newUser = await User.create(req.body);    
+    const payload = { id: newUser._id, email: newUser.email };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 10 });
+    const url = `http://localhost:3000/confirmation/${token}`;
+    
+    await transporter.sendMail({
+        to: 'rgrassi1@gmail.com',
+        subject: 'Confirm E-mail',
+        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`    
+    });
+
+    const restrictedUser = { _id: newUser._id, email: newUser.email };
     res.status(201).json(restrictedUser);
 }
+
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'kanimalking@gmail.com',
+      pass: 'r@@t1234'
+    }    
+});
 
 const updateAvatar = async(req, res) => {
     const { key = '', location: url = '' } = req.file;
