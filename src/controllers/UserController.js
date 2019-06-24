@@ -45,17 +45,13 @@ const confirmMail = async(req, res) => {
     try {
         const userDecoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({ email: userDecoded.email });
-        if (user) {
-            if (!user.active) {
-                user.active = true;
-                await user.save();    
-                res.render('')
-            } else {
-                res.render('')
-            }  
+        if (!user.active) {
+            user.active = true;
+            await user.save();    
+            res.render('')
         } else {
-            res.status(404).send({ success: false, message: 'User not found' })
-        }
+            res.render('')
+        }  
     } catch(err) {
         res.send({ success: false, message: err });
     }
