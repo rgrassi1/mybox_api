@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
 const signIn = async(req, res) => {
@@ -24,23 +24,45 @@ const signUp = async(req, res) => {
         return res.send({ success: false, message: 'User not available' })
     }
 
-    const newUser = await User.create(req.body);    
+    const newUser = await User.create(req.body); 
+
     const payload = { id: newUser._id, email: newUser.email };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 10 });
-    const url = `http://localhost:3000/confirmation/${token}`;
-    
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const url = `http://localhost:3333/restrito/users/confirm-email/?token=${token}`;
+
     await transporter.sendMail({
-        to: 'rgrassi1@gmail.com',
-        subject: 'Confirm E-mail',
-        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`    
+        to: newUser.email,
+        cc: 'kanimalking@gmail.com',
+        subject: 'MyBox - ativação de conta',
+        html: `<div><p style="font-weight: 400; color: #202124">Por favor clique no botão para ativar a sua conta.</p><a style="display: block; padding: 15px 0; background: #7159c1; color: #FFF; text-decoration: none; border-radius: 4px; font-size: 16px" href="${url}">Ativar a conta</a></div>`
     });
 
-    const restrictedUser = { _id: newUser._id, email: newUser.email };
-    res.status(201).json(restrictedUser);
+    res.status(201).json(payload);
+}
+
+const confirmMail = async(req, res) => {
+    const { token } = req.query;
+    try {
+        const userDecoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findOne({ email: userDecoded.email });
+        if (user) {
+            if (!user.active) {
+                user.active = true;
+                await user.save();    
+                res.render('')
+            } else {
+                res.render('')
+            }  
+        } else {
+            res.status(404).send({ success: false, message: 'User not found' })
+        }
+    } catch(err) {
+        res.send({ success: false, message: err });
+    }
 }
 
 const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    service: 'gmail',        
     auth: {
       user: 'kanimalking@gmail.com',
       pass: 'r@@t1234'
@@ -61,4 +83,4 @@ const updateAvatar = async(req, res) => {
     }
 }
 
-module.exports = { signIn, signUp, updateAvatar }
+module.exports = { signIn, signUp, updateAvatar, confirmMail }
