@@ -11,36 +11,44 @@ const signIn = async(req, res) => {
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60  * 60 * 24 });
             res.send({ success: true, token: token })
         } else {
-            res.send({ success: false, message: 'Wrong credentials' });
+            res.send({ success: false, message: 'wrong credentials' });
         }    
     } else {
-        res.send({ success: false, message: 'Wrong credentials' });
+        res.send({ success: false, message: 'wrong credentials' });
     } 
 }
 
 const signUp = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
     if (user) {
-        return res.send({ success: false, message: 'User not available' })
+        return res.send({ success: false, message: 'user not available' })
+    }
+    
+    const newUser = await User.create(req.body);
+    const payload = { id: newUser._id, email: newUser.email };
+    res.status(201).send({ success: true, user: payload });
+}
+
+const sendEmail = async(req, res) => {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return res.status(404).send({ success: false, message: 'user not found' });        
     }
 
-    const newUser = await User.create(req.body); 
-
-    const payload = { id: newUser._id, email: newUser.email };
+    const payload = { id: user._id, email: user.email };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
-    const url = `http://localhost:3333/restrito/users/confirm-email/?token=${token}`;
-
+    const url = `${process.env.APP_URL}/restrito/users/confirm-email/?token=${token}`;
     await transporter.sendMail({
         to: newUser.email,
         cc: 'kanimalking@gmail.com',
         subject: 'MyBox - ativação de conta',
-        html: `<div><p style="font-weight: 400; color: #202124">Por favor clique no botão para ativar a sua conta.</p><a style="display: block; padding: 15px 0; background: #7159c1; color: #FFF; text-decoration: none; border-radius: 4px; font-size: 16px" href="${url}">Ativar a conta</a></div>`
+        html: `<div><p style="font-weight: 400; color: #202124">Por favor clique no botão para ativar a sua conta.</p><a style="display: block; text-align: center; padding: 15px 0; background: #7159c1; color: #FFF; text-decoration: none; border-radius: 4px; font-size: 16px" href="${url}">Ativar a conta</a></div>`
     });
 
-    res.status(201).json(payload);
+    res.send({ success: true, message: 'email sent' })
 }
 
-const confirmMail = async(req, res) => {
+const confirmEmail = async(req, res) => {
     const { token } = req.query;
     try {
         const userDecoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -48,9 +56,9 @@ const confirmMail = async(req, res) => {
         if (!user.active) {
             user.active = true;
             await user.save();    
-            res.render('')
+            res.send({ success: true, message: 'account activated successfully' });
         } else {
-            res.render('')
+            res.send({ success: false, message: 'account has already been activated' });
         }  
     } catch(err) {
         res.send({ success: false, message: err });
@@ -75,8 +83,8 @@ const updateAvatar = async(req, res) => {
         const updatedUser = await user.save();
         res.json(updatedUser);    
     } else {
-        res.status(404).send({ success: false, message: 'User not found' })
+        res.status(404).send({ success: false, message: 'user not found' })
     }
 }
 
-module.exports = { signIn, signUp, updateAvatar, confirmMail }
+module.exports = { signIn, signUp, updateAvatar, confirmEmail, sendEmail }
