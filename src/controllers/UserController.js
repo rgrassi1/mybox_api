@@ -39,7 +39,7 @@ const sendEmail = async(req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
     const url = `${process.env.APP_URL}/restrito/users/confirm-email/?token=${token}`;
     await transporter.sendMail({
-        to: newUser.email,
+        to: user.email,
         cc: 'kanimalking@gmail.com',
         subject: 'MyBox - ativação de conta',
         html: `<div><p style="font-weight: 400; color: #202124">Por favor clique no botão para ativar a sua conta.</p><a style="display: block; text-align: center; padding: 15px 0; background: #7159c1; color: #FFF; text-decoration: none; border-radius: 4px; font-size: 16px" href="${url}">Ativar a conta</a></div>`
