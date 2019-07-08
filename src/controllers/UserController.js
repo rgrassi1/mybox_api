@@ -4,18 +4,22 @@ const User = require('../models/User');
 
 const signIn = async(req, res) => {
     const user = await User.findOne({ email: req.body.email })
-    if (user) {
-        const signed = await user.checkPassword(req.body.password);
-        if (signed) {
-            const payload = { id: user._id, email: user.email }
-            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60  * 60 * 24 });
-            res.send({ success: true, token: token })
-        } else {
-            res.send({ success: false, message: 'wrong credentials' });
-        }    
-    } else {
-        res.send({ success: false, message: 'wrong credentials' });
-    } 
+    if (!user) {
+        return res.send({ success: false, message: 'could not find your account' });
+    }    
+    if (!user.active) {
+        return res.send({ success: false, message: 'could not find your account' })
+    }
+
+    const signed = await user.checkPassword(req.body.password);
+    
+    if (!signed) {
+        return res.send({ success: false, message: 'wrong credentials' });
+    }
+
+    const payload = { id: user._id, email: user.email }
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.send({ success: true, token: token });
 }
 
 const signUp = async(req, res) => {
