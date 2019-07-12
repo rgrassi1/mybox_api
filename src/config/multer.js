@@ -38,6 +38,6 @@ module.exports = {
     dest: path.resolve(__dirname, '..', '..', 'tmp'),  
     storage: storageTypes[process.env.STORAGE_TYPE], 
     limits: {
-        fileSize: 10 * 1024 * 1024
+        fileSize: 100 * 1024 * 1024
     }
 }
